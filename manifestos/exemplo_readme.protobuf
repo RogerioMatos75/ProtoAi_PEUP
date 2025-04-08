@@ -1,0 +1,31 @@
+{
+  "name": "exemplo-repositorio",
+  "version": "1.0.0",
+  "description": "Repositório de exemplo para demonstração do PEUP",
+  "tags": ["exemplo", "demonstração", "peup"],
+  "communication_details": {
+    "access_interfaces": [
+      {
+        "type": "REST",
+        "base_url_or_address": "http://api.exemplo.com",
+        "available_methods_or_operations": ["GET", "POST", "PUT", "DELETE"]
+      }
+    ],
+    "default_data_formats": ["json", "protobuf"]
+  },
+  "security_info": {
+    "encryption_required": true
+  },
+  "monetization_info": {
+    "model": "FREEMIUM",
+    "price_details": "Gratuito para uso básico, planos premium disponíveis",
+    "currency": "BRL",
+    "pricing_page_url": "http://exemplo.com/pricing",
+    "commission_enabled": true,
+    "commission_details_url": "http://exemplo.com/affiliate"
+  },
+  "licensing_info": {
+    "license_key": "MIT",
+    "license_url": "http://exemplo.com/license"
+  }
+}
