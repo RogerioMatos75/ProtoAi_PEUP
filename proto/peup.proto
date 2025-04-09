@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package peup;
+
+// Estrutura da Intenção (PIS)
+message IntentRequest {
+    string protoai_intent = 1;
+    string action = 2;
+    string scope = 3;
+    map<string, string> parameters = 4;
+    string response_format = 5;
+}
+
+// Estrutura da Resposta
+message IntentResponse {
+    string status = 1;
+    string message = 2;
+    // Usando google.protobuf.Any para suportar diferentes tipos de resultado
+    optional bytes result = 3;
+}
+
+// Serviço PEUP
+service PEUPService {
+    // Processa uma intenção e retorna uma resposta
+    rpc ProcessIntent(IntentRequest) returns (IntentResponse);
+}

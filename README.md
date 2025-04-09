@@ -1,25 +1,53 @@
 # PEUP - Ponto de Entrada Universal ProtoAi
 
-O PEUP (Ponto de Entrada Universal ProtoAi) é um componente central do ecossistema ProtoAi que atua como um gateway universal para processamento de intenções e comunicação com diferentes serviços.
-
 ## Visão Geral
+O PEUP (Ponto de Entrada Universal ProtoAi) é um serviço que atua como gateway unificado para processamento de intenções e gerenciamento de manifestos no ecossistema ProtoAi. Implementado em Go com componentes em Rust para processamento de linguagem natural.
 
-O ProtoAi MCP é uma solução projetada para facilitar a descoberta, documentação e interação com serviços, especialmente focada em cenários envolvendo agentes de IA. O sistema é construído sobre três pilares principais:
+## Arquitetura
+- **Backend Principal (Go)**: Servidor HTTP/gRPC para processamento de requisições
+- **Processador de Intenções (Rust)**: Análise e interpretação de queries em linguagem natural
+- **Cache de Manifestos**: Sistema de cache em memória para otimização de performance
+- **Protobuf**: Comunicação padronizada entre componentes usando Protocol Buffers
 
-- **Manifestos Semânticos** (`README.protobuf`): Documentação estruturada que descreve capacidades, interfaces e políticas de serviços
-- **Mecanismos de Descoberta de Serviços**: Sistema para localizar e interagir com serviços compatíveis
-- **Especificação de Intenções Padronizada**: Formato padronizado para expressar requisições
+## Requisitos do Sistema
+- Go 1.20 ou superior
+- Rust (última versão estável)
+- Protobuf compiler
 
-## Estrutura do Projeto
+## Instalação
 
+### 1. Clone o Repositório
+```bash
+git clone [url-do-repositorio]
+cd peup
 ```
-peup/
-├── api/            # Endpoints da API FastAPI
-├── models/         # Modelos de dados e schemas
-├── manifestos/     # Definições de manifestos e Protocol Buffers
-├── services/       # Serviços de negócio
-└── tests/          # Testes unitários e de integração
+
+### 2. Instale as Dependências
+```bash
+# Go dependencies
+go mod download
+
+# Rust dependencies (para o serviço de intenções)
+cd services/intent_service
+cargo build --release
+cd ../..
 ```
+
+### 3. Compile os Arquivos Protocol Buffer
+```bash
+protoc --go_out=. --go_opt=paths=source_relative \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    proto/*.proto
+```
+
+## Executando o Serviço
+```bash
+# Inicie o servidor
+go run cmd/peup/main.go
+```
+O servidor estará disponível em:
+- HTTP: `http://localhost:8080`
+- gRPC: `localhost:50051`
 
 ## Funcionalidades Principais
 
@@ -41,71 +69,45 @@ O PEUP aceita intenções em diferentes formatos:
 ```
 
 - **URI-like**: `protoai:buscar?escopo=repositorio_git&tipo=jogo`
-- **Linguagem Natural Estruturada**: `BUSCAR repositorios_git TIPO=jogo.protobuf`
+- **Linguagem Natural**: `Buscar repositórios git do tipo jogo`
 
-### 2. Fluxo de Processamento
+### 2. Formatos de Resposta
+O PEUP suporta múltiplos formatos de resposta:
+- Protocol Buffers (padrão)
+- JSON
+- Outros formatos específicos conforme necessidade
 
-1. **Recebimento da Intenção**:
-   - Endpoint `/intent` para requisições HTTPS
-   - Parsing e validação da intenção PIS
-   - Identificação de ação e escopo
+### 3. Cache de Manifestos
+Implementa um sistema de cache em memória para:
+- Redução de latência
+- Otimização de recursos
+- Cache invalidation baseado em tempo
 
-2. **Descoberta de Serviço**:
-   - Consulta ao Registry Service
-   - Download e processamento do manifesto
+## Endpoints
 
-3. **Execução**:
-   - Mapeamento de parâmetros
-   - Chamada ao serviço alvo
-   - Formatação da resposta
+### POST /intent
+Processa intenções em formato JSON ou texto natural.
 
-### 3. Benefícios
-
-- **Acessibilidade Universal**: Compatível com qualquer cliente HTTPS
-- **Ponto Único de Interação**: Simplificação da integração
-- **Segurança**: Comunicação criptografada e controle de acesso
-- **Flexibilidade**: Suporte a múltiplos formatos e protocolos
-
-## Configuração e Execução
-
-1. Instale as dependências:
-```bash
-pip install -r requirements.txt
-```
-
-2. Execute o servidor:
-```bash
-uvicorn api.main:app --reload
-```
+### POST /peup
+Endpoint principal para processamento de intenções com suporte a Protocol Buffers.
 
 ## Desenvolvimento
 
-O PEUP é desenvolvido usando FastAPI e Protocol Buffers para garantir:
-- Alta performance na comunicação
-- Tipagem forte entre serviços
-- Documentação automática via OpenAPI/Swagger
-- Cache de manifestos para otimização
-
-## Segurança e Escalabilidade
-
-### Segurança
-- Autenticação e autorização em nível de serviço
-- Validação de intenções
-- Proteção contra uso indevido
-
-### Escalabilidade
-- Cache de manifestos
-- Balanceamento de carga
-- Descoberta distribuída
+### Estrutura do Projeto
+```
+/
+├── cmd/
+│   └── peup/           # Ponto de entrada da aplicação
+├── proto/              # Definições Protocol Buffer
+├── server/             # Implementação do servidor gRPC
+├── services/
+│   ├── intent_service/ # Serviço de processamento de intenções (Rust)
+│   └── manifest/       # Serviço de gerenciamento de manifestos
+└── manifestos/         # Manifestos de exemplo e templates
+```
 
 ## Contribuindo
-
-1. Faça um fork do projeto
-2. Crie sua feature branch (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
-5. Crie um novo Pull Request
+Contribuições são bem-vindas! Por favor, leia nossas diretrizes de contribuição antes de submeter pull requests.
 
 ## Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob os termos da licença MIT.

@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package peup;
+
+// Estrutura do Manifesto
+message Manifest {
+    string service_id = 1;
+    string version = 2;
+    ServiceEndpoint endpoint = 3;
+    repeated ServiceCapability capabilities = 4;
+    ServiceMetadata metadata = 5;
+}
+
+// Endpoint do Serviço
+message ServiceEndpoint {
+    string url = 1;
+    string protocol = 2;  // "http", "grpc", etc.
+    map<string, string> headers = 3;
+    int32 timeout_ms = 4;
+}
+
+// Capacidades do Serviço
+message ServiceCapability {
+    string action = 1;
+    string scope = 2;
+    repeated string supported_formats = 3;
+    map<string, string> required_parameters = 4;
+    FallbackConfig fallback = 5;
+}
+
+// Configuração de Fallback
+message FallbackConfig {
+    string fallback_service_id = 1;
+    map<string, string> parameter_mapping = 2;
+    int32 retry_count = 3;
+}
+
+// Metadados do Serviço
+message ServiceMetadata {
+    string name = 1;
+    string description = 2;
+    string owner = 3;
+    int64 cache_ttl_seconds = 4;
+    repeated string tags = 5;
+}
