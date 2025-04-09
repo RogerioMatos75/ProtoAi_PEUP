@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package protoai.v1;
+
+message ReadmeProto {
+  string name = 1;
+  string version = 2;
+  string description = 3;
+  repeated string tags = 4;
+  CommunicationDetails communication_details = 5;
+  SecurityInfo security_info = 6;
+  MonetizationInfo monetization_info = 7;
+  LicensingInfo licensing_info = 8;
+}
+
+message CommunicationDetails {
+  repeated AccessInterface access_interfaces = 1;
+  repeated string default_data_formats = 2;
+}
+
+message AccessInterface {
+  enum IfType {
+    UNDEFINED = 0;
+    REST = 1;
+    GRAPHQL = 2;
+    GRPC = 3;
+  }
+  IfType type = 1;
+  string base_url_or_address = 2;
+  repeated string available_methods_or_operations = 3;
+}
+
+message SecurityInfo {
+  bool encryption_required = 1;
+}
+
+message MonetizationInfo {
+  enum ModelType {
+    MODEL_TYPE_UNSPECIFIED = 0;
+    FREE = 1;
+    PAID = 2;
+    FREEMIUM = 3;
+  }
+  ModelType model = 1;
+  string price_details = 2;
+  string currency = 3;
+  string pricing_page_url = 4;
+  bool commission_enabled = 5;
+  string commission_details_url = 6;
+}
+
+message LicensingInfo {
+  string license_key = 1;
+  string license_url = 2;
+}

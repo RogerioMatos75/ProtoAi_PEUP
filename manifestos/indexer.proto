@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package protoai.github_indexer.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// Mensagem para representar um projeto/repositório vindo do CSV
+message ProjectInfoFromCsv {
+  string id = 1;              // ID do CSV
+  string name = 2;
+  string description = 3;
+  string type = 4;            // web, mobile, jogo
+  repeated string image_urls = 5; // Lista de URLs de imagem
+  int32 level = 6;            // Nível (convertido para int)
+  string repository_url = 7;
+  bool featured = 8;          // Destaque
+}
+
+// ----- Mensagens para Registro e Acesso -----
+message RegisterRepoRequest {
+  string repository_url = 1;
+  string access_token = 2;
+}
+
+message RegisterRepoResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RequestAccessRequest {
+  string repository_url = 1;
+}
+
+message RequestAccessResponse {
+  bool granted = 1;
+  string message = 2;
+}
+
+message GetDataRequest {
+  string repository_url = 1;
+  string owner = 2;      // Proprietário do repositório
+  string repo_name = 3;  // Nome do repositório
+  bool include_readme = 4; // Se deve incluir informações do README
+}
+
+message GetDataResponse {
+  ProjectInfoFromCsv project_info = 1;
+  string readme_content = 2; // Conteúdo bruto do README
+  ReadmeInfo readme_info = 3; // Informações estruturadas do README
+}
+
+// ----- Novas Mensagens para Busca Semântica -----
+message SearchRepositoriesRequest {
+  string query = 1;             // Query em linguagem natural
+  repeated string required_tags = 2; // Tags obrigatórias
+  repeated string filter_by_type = 3; // Filtrar por 'web', 'mobile', 'jogo'
+  int32 minimum_level = 4;        // Filtrar por nível mínimo
+  bool only_featured = 5;         // Filtrar apenas destaques
+}
+
+message SearchResult {
+  ProjectInfoFromCsv project = 1; // Informações básicas do projeto
+  float relevance_score = 2;      // Pontuação de relevância
+  string highlighted_snippet = 3;  // Trecho relevante da descrição
+  repeated string matching_features = 4; // Funcionalidades que correspondem à busca
+}
+
+message SearchRepositoriesResponse {
+  repeated SearchResult results = 1;
+  int32 total_results = 2; // Total de resultados
+}
+
+// Informações estruturadas extraídas do README
+message ReadmeInfo {
+  string description = 1; // Descrição do projeto
+  repeated string features = 2; // Lista de funcionalidades
+  string installation = 3; // Instruções de instalação
+  string usage = 4; // Instruções de uso
+  repeated string tags = 5; // Tags para busca semântica
+}
+
+// ----- Serviço -----
+service GithubIndexer {
+  // Métodos de registro e acesso
+  rpc RegisterRepo(RegisterRepoRequest) returns (RegisterRepoResponse);
+  rpc RequestAccess(RequestAccessRequest) returns (RequestAccessResponse);
+  rpc GetData(GetDataRequest) returns (GetDataResponse);
+
+  // Método de busca semântica
+  rpc SearchRepositories(SearchRepositoriesRequest) returns (SearchRepositoriesResponse);
+}

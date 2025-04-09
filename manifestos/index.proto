@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package protoai.v1;
+
+import "readme.proto";
+
+// Definição do serviço principal de comunicação AI-to-API
+service AItoAPIService {
+    // Processa uma intenção e retorna a resposta apropriada
+    rpc ProcessIntent (IntentRequest) returns (IntentResponse);
+    
+    // Busca um manifesto específico
+    rpc GetManifest (ManifestRequest) returns (ReadmeProto);
+    
+    // Stream de eventos para atualizações em tempo real
+    rpc StreamUpdates (StreamRequest) returns (stream UpdateEvent);
+}
+
+// Estrutura da requisição de intenção
+message IntentRequest {
+    string version = 1;          // Versão da API (ex: "1.0")
+    string action = 2;           // Ação desejada (ex: "BUSCAR")
+    string scope = 3;            // Escopo da ação
+    map<string, string> parameters = 4;  // Parâmetros adicionais
+    string response_format = 5;   // Formato desejado da resposta
+    AuthInfo auth_info = 6;      // Informações de autenticação
+}
+
+// Estrutura da resposta de intenção
+message IntentResponse {
+    string request_id = 1;       // ID único da requisição
+    oneof response {
+        ReadmeProto manifest = 2;    // Resposta do manifesto
+        string error = 3;            // Mensagem de erro, se houver
+        bytes raw_data = 4;          // Dados brutos da resposta
+    }
+    ResponseMetadata metadata = 5;    // Metadados da resposta
+}
+
+// Estrutura de requisição de manifesto
+message ManifestRequest {
+    string scope = 1;            // Escopo do manifesto
+    AuthInfo auth_info = 2;      // Informações de autenticação
+}
+
+// Estrutura para streaming de atualizações
+message StreamRequest {
+    repeated string scopes = 1;   // Escopos para monitorar
+    AuthInfo auth_info = 2;       // Informações de autenticação
+}
+
+// Evento de atualização
+message UpdateEvent {
+    string scope = 1;            // Escopo atualizado
+    string event_type = 2;       // Tipo do evento
+    bytes payload = 3;           // Dados da atualização
+    int64 timestamp = 4;         // Timestamp do evento
+}
+
+// Informações de autenticação
+message AuthInfo {
+    oneof auth_type {
+        string token = 1;        // Token de autenticação
+        NFTAuth nft_auth = 2;    // Autenticação via NFT
+    }
+}
+
+// Autenticação via NFT
+message NFTAuth {
+    string contract_address = 1;  // Endereço do contrato NFT
+    string token_id = 2;         // ID do token
+    string wallet_address = 3;    // Endereço da carteira
+}
+
+// Metadados da resposta
+message ResponseMetadata {
+    string source = 1;           // Fonte da resposta (cache/api/fallback)
+    int64 timestamp = 2;         // Timestamp da resposta
+    int32 ttl = 3;              // Time-to-live em segundos
+    map<string, string> extra = 4; // Metadados extras
+}
