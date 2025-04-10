@@ -1,0 +1,4 @@
+name,description,url,tags,owner,license,version
+ProtoAi MCP,Sistema de Manifesto e Descoberta para APIs,https://github.com/user/protoai-mcp,"api,discovery,semantic-manifest",ProtoAi Team,MIT,1.0.0
+Example API,API de exemplo para demonstração,https://github.com/user/example-api,"example,api,demo",Example Team,Apache-2.0,2.1.0
+Test Service,Serviço de teste com manifesto semântico,https://github.com/user/test-service,"test,service,semantic",Test Team,BSD-3-Clause,0.9.0
